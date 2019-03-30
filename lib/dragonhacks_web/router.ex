@@ -2,6 +2,7 @@ defmodule DragonhacksWeb.Router do
   use DragonhacksWeb, :router
 
   pipeline :api do
+    plug CORSPlug, [origin: "*"]
     plug :accepts, ["json"]
   end
 
