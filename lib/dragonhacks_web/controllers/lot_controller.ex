@@ -27,13 +27,15 @@ defmodule DragonhacksWeb.LotController do
     {lot_num, _} = Integer.parse(id)
     lot_queue = Dragonhacks.SharedMap.get(QueueMap, lot_num, :queue.new)
     report_list = :queue.to_list(lot_queue)
+    status = Dragonhacks.SharedMap.get(StatusMap, lot_num, 0)
 
     lot_and_reports = %{
       lot: lot,
-      reports: report_list
+      reports: report_list,
+      status: status
     }
 
-    render(conn, "lot_and_reports.json", lot_and_reports)
+    render(conn, "lot_and_metadata.json", lot_and_reports)
   end
 
   def update(conn, %{"id" => id, "lot" => lot_params}) do

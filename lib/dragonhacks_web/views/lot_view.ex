@@ -20,13 +20,13 @@ defmodule DragonhacksWeb.LotView do
     }
   end
 
-  def render("lot_and_reports.json", %{lot: lot, reports: reports}) do
+  def render("lot_and_metadata.json", %{lot: lot, reports: reports, status: status}) do
     %{id: lot.id,
       name: lot.name,
       address: lot.address,
       lat: lot.lat,
       lng: lot.lng,
-      status: lot.status,
+      status: status,
       reports: render_many(reports, DragonhacksWeb.ReportView, "report_no_id.json")
     }
   end
