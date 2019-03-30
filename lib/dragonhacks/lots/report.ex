@@ -2,12 +2,13 @@ defmodule Dragonhacks.Lots.Report do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Dragonhacks.Lots.Lot
+
 
   schema "reports" do
     field :status, :string
     field :timestamp, :utc_datetime
-    belongs_to( :lot, Lot,
-      foreign_key: :lot_id, references: :id)
+    belongs_to :lot, Lot
 
     timestamps()
   end
