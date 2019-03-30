@@ -51,8 +51,8 @@ config :phoenix, :stacktrace_depth, 20
 # Configure your database
 config :dragonhacks, Dragonhacks.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
+  username: "rofael",
+  password: "masterbob",
   database: "dragonhacks_dev",
-  hostname: "localhost",
+  hostname: "pg1.c5ilqplnx4gh.us-east-1.rds.amazonaws.com",
   pool_size: 10
