@@ -5,7 +5,7 @@ defmodule Dragonhacks.Repo.Migrations.CreateReports do
     create table(:reports) do
       add :status, :string
       add :timestamp, :utc_datetime
-      add :lot_id, references(:lots_id, on_delete: :nothing)
+      add :lot_id, references(:lots, column: :id, on_delete: :nothing)
 
       timestamps()
     end

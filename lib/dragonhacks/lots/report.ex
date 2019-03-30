@@ -6,7 +6,8 @@ defmodule Dragonhacks.Lots.Report do
   schema "reports" do
     field :status, :string
     field :timestamp, :utc_datetime
-    field :lot_id, :id
+    belongs_to( :lot, Lot,
+      foreign_key: :lot_id, references: :id)
 
     timestamps()
   end
