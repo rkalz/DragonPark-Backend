@@ -19,7 +19,7 @@ defmodule DragonhacksWeb.ReportController do
 
     lot_id = Map.get(transformed_params, "lot_id")
     lot_queue = Dragonhacks.SharedMap.get(QueueMap, lot_id, nil)
-    update_lot_status(lot_id, lot_queue, 0, 0)
+    update_lot_status(lot_id, lot_queue)
 
     with {:ok, %Report{} = report} <- Lots.create_report(transformed_params) do
       conn
@@ -37,31 +37,47 @@ defmodule DragonhacksWeb.ReportController do
     report = Map.put(report, "timestamp", timestamp)
     queue = :queue.in(report, queue)
     Dragonhacks.SharedMap.put(QueueMap, lot_id, queue)
+
+    Logger.debug "Queue for lot #{lot_id} is now size #{:queue.len(queue)}"
+    # Emit new report to lot channel
   end
 
-  def update_lot_status(lot_id, lot_queue, sum_of_status, consumed_reports) do
+  def purge_old_records(lot_id, lot_queue) do
+    oldest = :queue.get(lot_queue)
+    oldest_time = Map.get(oldest, "timestamp")
+    newest = :queue.get_r(lot_queue)
+    newest_time = Map.get(newest, "timestamp")
+
+    if DateTime.diff(newest_time, oldest_time) > 3600 do
+      updated_queue = :queue.drop(lot_queue)
+      purge_old_records(lot_id, updated_queue)
+    else
+      Dragonhacks.SharedMap.put(QueueMap, lot_id, lot_queue)
+      calculate_new_lot_state(lot_id, lot_queue, 0, 0)
+    end
+  end
+
+  def calculate_new_lot_state(lot_id, lot_queue, sum, count) do
     if :queue.is_empty(lot_queue) do
-      new_status = :math.floor(sum_of_status / consumed_reports)
+      new_status = round(sum / count)
       old_status = Dragonhacks.SharedMap.get(StatusMap, lot_id, 0)
+      Logger.debug "calculated status #{new_status} for lot #{lot_id} (old status #{old_status})"
 
       if new_status != old_status do
-        Logger.debug "Lot status updated!"
         Dragonhacks.SharedMap.put(StatusMap, lot_id, new_status)
+
+        Logger.debug "Updated status of lot #{lot_id} from #{old_status} to #{new_status}"
+        # Globally emit new status
       end
     else
       oldest = :queue.get(lot_queue)
-      oldest_time = Map.get(oldest, "timestamp")
-
-      newest_time = Map.get(:queue.get_r(lot_queue), "timestamp")
-      updated_queue = :queue.drop(lot_queue)
-
-      if DateTime.diff(newest_time, oldest_time) > 3600 do
-        update_lot_status(lot_id, updated_queue, sum_of_status, consumed_reports)
-      else
-        status = Map.get(oldest, "status")
-        update_lot_status(lot_id, updated_queue, sum_of_status + status, consumed_reports + 1)
-      end
+      status = Map.get(oldest, "status")
+      calculate_new_lot_state(lot_id, :queue.drop(lot_queue), sum + status, count + 1)
     end
+  end
+
+  def update_lot_status(lot_id, lot_queue) do
+    purge_old_records(lot_id, lot_queue)
   end
 
   def show(conn, %{"id" => id}) do

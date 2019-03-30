@@ -15,4 +15,17 @@ defmodule DragonhacksWeb.ReportView do
       status: report.status,
       timestamp: report.timestamp}
   end
+
+  def render("report_no_id.json", %{report: report}) do
+    %{status: Map.get(report, "status"),
+      timestamp: Map.get(report, "timestamp") |> report_timestamp_to_string}
+  end
+
+  defp report_timestamp_to_string( { {year, month, day}, {hour, minute, seconds, microseconds} }) do
+    "#{year}-#{month}-#{day}T#{hour}:#{minute}:#{seconds}.#{microseconds}Z"
+  end
+
+  defp report_timestamp_to_string( %DateTime{} = time ) do
+    time |> DateTime.to_string
+  end
 end

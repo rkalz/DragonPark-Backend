@@ -1,6 +1,8 @@
 defmodule DragonhacksWeb.LotController do
   use DragonhacksWeb, :controller
 
+  require Logger
+
   alias Dragonhacks.Lots
   alias Dragonhacks.Lots.Lot
 
@@ -22,7 +24,16 @@ defmodule DragonhacksWeb.LotController do
 
   def show(conn, %{"id" => id}) do
     lot = Lots.get_lot!(id)
-    render(conn, "show.json", lot: lot)
+    {lot_num, _} = Integer.parse(id)
+    lot_queue = Dragonhacks.SharedMap.get(QueueMap, lot_num, :queue.new)
+    report_list = :queue.to_list(lot_queue)
+
+    lot_and_reports = %{
+      lot: lot,
+      reports: report_list
+    }
+
+    render(conn, "lot_and_reports.json", lot_and_reports)
   end
 
   def update(conn, %{"id" => id, "lot" => lot_params}) do
