@@ -12,5 +12,9 @@ defmodule DragonhacksWeb.Router do
 
     resources "/lots", LotController, except: [:new, :edit]
     resources "/reports", ReportController, except: [:new, :edit]
+
+    options "/lots", LotController, :options
+    options "/lots/:id", LotController, :options
+    options "/reports", ReportController, :options
   end
 end
