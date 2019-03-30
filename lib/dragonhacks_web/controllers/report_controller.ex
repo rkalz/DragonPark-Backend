@@ -12,7 +12,8 @@ defmodule DragonhacksWeb.ReportController do
   end
 
   def create(conn, %{"report" => report_params}) do
-    with {:ok, %Report{} = report} <- Lots.create_report(report_params) do
+    transformed_params = Map.put(report_params, "timestamp", DateTime.utc_now() |> DateTime.to_string)
+    with {:ok, %Report{} = report} <- Lots.create_report(transformed_params) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", report_path(conn, :show, report))

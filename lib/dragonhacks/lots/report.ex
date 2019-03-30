@@ -17,7 +17,7 @@ defmodule Dragonhacks.Lots.Report do
   def changeset(report, attrs) do
     report
     |> cast(attrs, [:status, :timestamp, :lot_id])
-    |> validate_required([:status, :tmestamp, :lot_id])
+    |> validate_required([:status, :timestamp, :lot_id])
     |> foreign_key_constraint(:lot_id)
   end
 end
