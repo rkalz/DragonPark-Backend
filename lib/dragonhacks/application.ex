@@ -14,7 +14,8 @@ defmodule Dragonhacks.Application do
       supervisor(DragonhacksWeb.Endpoint, []),
       # Start your own worker by calling: Dragonhacks.Worker.start_link(arg1, arg2, arg3)
       # worker(Dragonhacks.Worker, [arg1, arg2, arg3]),
-      supervisor(Dragonhacks.SharedMap, [])
+      supervisor(Dragonhacks.SharedMap, [QueueMap], id: :queue_map),
+      supervisor(Dragonhacks.SharedMap, [StatusMap], id: :shared_map)
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

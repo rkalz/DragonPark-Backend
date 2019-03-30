@@ -3,7 +3,7 @@ defmodule Dragonhacks.Repo.Migrations.CreateReports do
 
   def change do
     create table(:reports) do
-      add :status, :string
+      add :status, :integer
       add :timestamp, :utc_datetime
       add :lot_id, references(:lots, column: :id, on_delete: :nothing)
 

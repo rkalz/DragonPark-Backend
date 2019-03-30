@@ -6,7 +6,7 @@ defmodule Dragonhacks.Lots.Report do
 
 
   schema "reports" do
-    field :status, :string
+    field :status, :integer, default: 0
     field :timestamp, :utc_datetime
     belongs_to :lot, Lot
 

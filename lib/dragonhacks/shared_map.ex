@@ -1,19 +1,17 @@
 defmodule Dragonhacks.SharedMap do
   use GenServer
 
-  require Logger
-
   # Client
-  def start_link() do
-    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
+  def start_link(name) do
+    GenServer.start_link(__MODULE__, nil, name: name)
   end
 
-  def get(key) do
-    GenServer.call(__MODULE__, {:get, key})
+  def get(name, key, default) do
+    GenServer.call(name, {:get, key, default})
   end
 
-  def put(key, val) do
-    GenServer.cast(__MODULE__, {:put, key, val})
+  def put(name, key, val) do
+    GenServer.cast(name, {:put, key, val})
   end
 
   # Server
@@ -21,8 +19,8 @@ defmodule Dragonhacks.SharedMap do
     {:ok, Map.new}
   end
 
-  def handle_call({:get, key}, _, state) do
-    {:reply, Map.get(state, key, :queue.new), state}
+  def handle_call({:get, key, default}, _, state) do
+    {:reply, Map.get(state, key, default), state}
   end
 
   def handle_cast({:put, key, val}, state) do
